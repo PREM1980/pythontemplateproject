@@ -20,7 +20,7 @@
 ########################################################
 # variable section
 
-NAME = "testproject"
+NAME = "pythontemplateproject"
 
 PYTHON=python
 COVERAGE=coverage
