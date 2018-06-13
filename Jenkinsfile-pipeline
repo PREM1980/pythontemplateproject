@@ -1,0 +1,64 @@
+caughtError = 0
+def publishedVersion = "unreleased"
+
+try {
+
+    node {
+        environment{
+
+        }
+        stage ('Checkout') {
+            checkout scm
+        }
+        stage('create virtualenvironment') {
+                sh '''
+
+                       set +e
+                       export PATH=/usr/local/bin:$PATH
+                       #export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
+                       #export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+                       #source /usr/local/bin/virtualenvwrapper.sh
+                       echo ${SHELL}
+                       [ -d venv ] && rm -rf venv
+                       #virtualenv --python=python2.7 venv
+                       virtualenv venv
+                       . venv/bin/activate
+                       #export PATH=${VIRTUAL_ENV}/bin:${PATH}
+                       #pip install --upgrade pip # upgrading to latest version causes this issue - https://stackoverflow.com/questions/45188413/python-pip-install-is-failing-with-attributeerror-module-object-has-no-att
+                       pip install -r requirements/base_requirements.txt -r requirements/dev_requirements.txt
+                       make clean
+                   '''
+
+        }
+        stage('Unittest') {
+            echo 'unittest'
+        }
+        stage('Nosetest') {
+            echo 'nosetest'
+        }
+        stage('Coverage') {
+            echo 'coverage'
+        }
+    }
+}
+
+catch(caughtError){
+    currentBuild.result = "FAILURE"
+    echo 'Build failed with Error: ' + caughtError.toString()
+    caughtError = caughtError
+
+}
+finally{
+    node {
+
+        stage("Cleanup Workspace") {
+            step([$class: 'WsCleanup'])
+        }
+
+
+        if (caughtError != 0) {
+            throw caughtError
+        }
+    }
+
+}
