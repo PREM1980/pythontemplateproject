@@ -10,14 +10,11 @@ try {
         stage ('Checkout') {
             checkout scm
         }
+
         stage('create virtualenvironment') {
                 sh '''
-
                        set +e
                        export PATH=/usr/local/bin:$PATH
-                       #export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python
-                       #export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
-                       #source /usr/local/bin/virtualenvwrapper.sh
                        echo ${SHELL}
                        [ -d venv ] && rm -rf venv
                        #virtualenv --python=python2.7 venv
@@ -30,6 +27,10 @@ try {
                    '''
 
         }
+
+        withEnv(['DISABLE_AUTH=true',
+                'VIRTUAL_ENV=${env.WORKSPACE}/venv'
+             'DB_ENGINE=sqlite'])
         stage ('Check_style') {
                  sh """
                     export PATH=${VIRTUAL_ENV}/bin:${PATH}
