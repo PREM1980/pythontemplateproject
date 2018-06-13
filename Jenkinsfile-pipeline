@@ -28,10 +28,8 @@ try {
 
         }
 
-        withEnv(['DISABLE_AUTH=true',
-                'VIRTUAL_ENV=${env.WORKSPACE}/venv'
-             'DB_ENGINE=sqlite'])
-        stage ('Check_style') {
+        withEnv(['VIRTUAL_ENV=${env.WORKSPACE}/venv']){
+            stage ('Check_style') {
                  sh """
                     export PATH=${VIRTUAL_ENV}/bin:${PATH}
                     make flake8 | tee report/flake8.log || true
@@ -52,6 +50,7 @@ try {
                   unstableTotalAll: '0',
                   usePreviousBuildAsReference: true
                 ])
+            }
         }
 
         stage('Unittest') {
